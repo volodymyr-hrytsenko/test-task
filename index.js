@@ -31,7 +31,8 @@ function parseData(arrData) {
         uniqueDate = {},
         arrResult = [
             []
-        ];
+        ],
+        header = ['Name/Date'];
 
     arrData.forEach(element => {
         if (!data.hasOwnProperty(element[0])) {
@@ -47,48 +48,45 @@ function parseData(arrData) {
     getOwnPropertyNames.forEach((key, index) => {
         arrResult[index] = [key];
         keys.forEach(date => {
-            if (typeof data[key][date] !== 'undefined'){
+            if (typeof data[key][date] !== 'undefined') {
                 arrResult[index].push(data[key][date]);
-            }else{
+            } else {
                 arrResult[index].push('-');
             }
         });
     });
 
+    keys.forEach(el => {
+        header.push(changeFormatDate(el));
+    });
+    arrResult.unshift(header);
+
     return arrResult;
 }
 
-function see() {
-    arrData = CSVToArray(allText);
+function changeFormatDate(date) {
+    let d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
 
-    // let test = parseData(arrData)
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
 
-    console.log(parseData(arrData));
+    return [year, month, day].join('-');
 }
 
+function downloadNewCsv() {
+    arrData = CSVToArray(allText);
 
+    const rows = parseData(arrData);
+    let csvContent = "data:text/csv;charset=utf-8," +
+        rows.map(e => e.join(",")).join("\n");
 
-
-
-
-
-
-
-
-
-
-// const rows = [
-//     ["name1", "city1", "some other info"],
-//     ["name2", "city2", "more info"]
-// ];
-
-// let csvContent = "data:text/csv;charset=utf-8," +
-//     rows.map(e => e.join(",")).join("\n");
-
-// var encodedUri = encodeURI(csvContent);
-// var link = document.createElement("a");
-// link.setAttribute("href", encodedUri);
-// link.setAttribute("download", "my_data.csv");
-// document.body.appendChild(link);
-
-// link.click();
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "new_data.csv");
+    document.body.appendChild(link);
+    link.click();
+}
